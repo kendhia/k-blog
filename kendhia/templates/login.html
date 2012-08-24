@@ -1,0 +1,46 @@
+<html>
+<body>
+<form method="post">
+    <style type="text/css">
+      label {text-align: right}
+    </style>
+    <h2>Submit</h2>
+    <table>
+        <tr>
+            <td>
+                <label> User Name
+            </td>
+            <td>
+                <input type="text" name="username" value="{{username}}">
+            </td>
+            <td>
+                <a style="color: red">{{error_usr}}</a>
+            </td>
+        </tr>
+                </label>
+            <br>
+        <tr>
+            <td>
+                <label> Password
+            </td>
+            <td>
+                <input type="password" name="password" value="{{password}}">
+            </td>
+            </label>
+            <td>
+                <a style="color: red">{{error_pass}}</a> 
+            </td>
+        </tr>
+
+            <br>
+            <br>
+            <tr>
+            <td>
+                <input type="submit">
+                </input>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
+</html>

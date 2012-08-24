@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Kendhia Blog</title>
+<style>
+            body {
+    position: relative;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 14px;
+
+    width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+    color: #333;
+}
+label {
+  display: block;
+  font-size: 20px;
+}
+label.title {
+    color: #222;
+
+}
+.age {
+    position: absolute;
+    bottom: 0px;
+    right: 0px;
+    color: 
+    gray;
+    font-size: 12px;
+    }
+.post {
+    margin-top: red;
+}
+.main-title {
+    display: block;
+    color: #222;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+    text-decoration: none;
+
+}
+</style>
+
+    <body>
+             <a href "/" class="main-title">Kendhia Blog "just a homework :)"</a>
+
+            <label>
+                <div>Subject</div>
+                <div name="subject">{{subject}}</div>
+                <hr>
+                <div>Post</div>
+                <pre name="content" >{{content}}</pre>
+            </label>
+                <div class='age'>Queried {{last}} seconds ago</div>
+
+    </body>
+</html>

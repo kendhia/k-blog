@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Hello</title>
+
+
+    <body>
+        <form method="post">
+            <label>
+        {% for post in posts %}
+                   <a name='content'>{{post.content}}</a>|
+                   <a name='content'>{{post.created}}</a>|
+                   <a href='/{{name}}?v={{post.key().id()}}'>view</a>
+                   <a href='/_edit/{{name}}'>Edit</a>
+                   <hr>
+        {% endfor %}
+
+            </label>
+        </form>
+    </body>
+</html>
