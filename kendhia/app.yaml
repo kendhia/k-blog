@@ -10,17 +10,13 @@ handlers:
   upload: favicon\.ico
 
 - url: /
-  script: Home.app
+  script: main.app
   
 - url: /rot13
   script: rot13.app
   
 - url: /blog
-  script: main.app
-  
-- url: .*
-  script: main.app
-  
+  script: main.app  
   
 libraries:
 - name: webapp2

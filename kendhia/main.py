@@ -138,7 +138,7 @@ class Submit(Handler):
             id = a.key().id()
             users = make_secure_val(id, str(password))
             self.response.headers.add_header('Set-Cookie', 'username=%s; Path=/' % users, )
-            self.redirect("/blog/welcome")
+            self.redirect("/welcome")
 class Blog(Handler):
     def Home_Page(self):
         contents= posts_caching()
@@ -159,7 +159,7 @@ class NewPost(Handler):
             a = Content(subject = subject, content = content)
             a.put()
             id = a.key().id()
-            self.redirect("/blog/%s" % id)
+            self.redirect("/%s" % id)
             post_only = Content.get_by_id(id)     
             posts_caching(update = True)
             last_query = int(time.time())
@@ -218,7 +218,7 @@ class Login(Handler):
 class Logout(Handler):
     def get(self):
         self.response.headers.add_header('Set-Cookie','username=; Path=/')
-        self.redirect("/signup")
+        self.redirect("/")
 class JsonArticleList(Handler): 
 
     def get(self):
@@ -246,11 +246,11 @@ class JsonSingleArticle(Handler):
 class Flush(Handler):
     def get(self):
         memcache.flush_all()
-        self.redirect('/blog')
+        self.redirect('/')
 		
 class WikiPage(Handler):
     def get(self, resource):
-        name = resource.rstrip('/').split('/')[-1]
+        name = resource.rstrip('/wiki/').split('/')[-1]
         wiki_valid = db.GqlQuery("SELECT * FROM WIKI where name = :1 ORDER BY created DESC",name).get()
         if wiki_valid:
             id = wiki_valid.key().id()
@@ -258,7 +258,7 @@ class WikiPage(Handler):
             content = text.content
             self.render('wiki2.html',content=content )
         else:
-            self.redirect('/_edit/%s' % name)
+            self.redirect('/wiki/_edit/%s' % name)
 
 
 class EditPage(Handler):
@@ -268,7 +268,7 @@ class EditPage(Handler):
             username = h.split('|')[0]
             user_name = db.GqlQuery("SELECT * FROM User where name = :1", username)
             if user_name:
-                name = resourse.rstrip('/').split('/')[-1]
+                name = resourse.rstrip('/wiki/').split('/')[-1]
                 wiki_valid = db.GqlQuery("SELECT * FROM WIKI where name = :1 ORDER BY created DESC",name).get()
                 if wiki_valid:
                     id = wiki_valid.key().id()
@@ -285,29 +285,29 @@ class EditPage(Handler):
             username = h.split('|')[0]
             user_name = db.GqlQuery("SELECT * FROM User where name = :1", username)
             if user_name:
-                name = resourse.rstrip('/').split('/')[-1]
+                name = resourse.rstrip('/wiki/').split('/')[-1]
                 text_area = self.request.get('content')
                 wiki_valid = db.GqlQuery("SELECT * FROM WIKI where name = :1", name).get()
                 if wiki_valid:
                     a = WIKI(content = str(text_area), name = name)
                     a.put()
-                    self.redirect('/%s' % name)
+                    self.redirect('/wiki/%s' % name)
                 else:
                     a = WIKI(content = text_area, name = name)
                     a.put()
-                    self.redirect('/%s' % name)
+                    self.redirect('/wiki/%s' % name)
             else:
                 self.redirect('/login')
 		
 class wiki_history(Handler):
     def get(self, resourse):
-        name = resourse.rstrip('/').split('/')[-1]
+        name = resourse.rstrip('/wiki/').split('/')[-1]
         posts = db.GqlQuery("SELECT * FROM WIKI where name = :1", name)
         self.render('history.html', posts = posts, name = name)
 
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'	
 
-app = webapp2.WSGIApplication([('/blog',Blog),('/blog/newpost',NewPost),('/blog/([0-9]+)', show_single_post)
-                               ,('/signup',Submit),('/login', Login),('/logout', Logout),('/blog/.json',JsonArticleList)
-                               ,('/blog/([0-9]+).json',JsonSingleArticle),('/blog/flush', Flush),('/_edit' + PAGE_RE, EditPage),('/_history' + PAGE_RE, wiki_history)
+app = webapp2.WSGIApplication([('/',Blog),('/newpost',NewPost),('/([0-9]+)', show_single_post)
+                               ,('/signup',Submit),('/login', Login),('/logout', Logout),('/.json',JsonArticleList)
+                               ,('/([0-9]+).json',JsonSingleArticle),('/flush', Flush),('/wiki/_edit' + PAGE_RE, EditPage),('/wiki/_history' + PAGE_RE, wiki_history)
                                , (PAGE_RE, WikiPage)],debug= True)
