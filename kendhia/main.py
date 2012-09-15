@@ -93,9 +93,9 @@ class WIKI(db.Model):
 
 
 
-class Submit(Handler):
+class signup(Handler):
     def get(self):
-        self.render('submit.html')
+        self.render('signup.html')
     def post(self):
         username = self.request.get('username')
         password = self.request.get('password')
@@ -130,7 +130,7 @@ class Submit(Handler):
         else:
             error_repass = ""
         if error_usr != "" or error_pass != "" or  error_pass != "" or  error_email != "":
-            self.render("submit.html", error_repass = error_repass,error_usr = error_usr,error_pass = error_pass, error_email = error_email,username = username, email = email)
+            self.render("signup.html", error_repass = error_repass,error_usr = error_usr,error_pass = error_pass, error_email = error_email,username = username, email = email)
         else:
             user_data = make_pw_hash(username, password)
             a = User(user_data = user_data,username = username)
@@ -138,18 +138,18 @@ class Submit(Handler):
             id = a.key().id()
             users = make_secure_val(id, str(password))
             self.response.headers.add_header('Set-Cookie', 'username=%s; Path=/' % users, )
-            self.redirect("/welcome")
+            self.redirect("/")
 class Blog(Handler):
     def Home_Page(self):
         contents= posts_caching()
         last_query = memcache.get('last')
         last = int(time.time()) - last_query
-        self.render("front_2.html", contents=contents,last=last)
+        self.render("Home_Page.html", contents=contents,last=last)
     def get(self):
         self.Home_Page()
 class NewPost(Handler):
     def render_front(self, subject="", content="", error=""):
-        self.render("front.html", subject=subject, content=content, error=error)
+        self.render("NewPost.html", subject=subject, content=content, error=error)
     def get(self):
          self.render_front()
     def post(self):
@@ -171,16 +171,25 @@ class NewPost(Handler):
 
 class show_single_post(Handler):
     def get(self, resource):
-        id = urllib.unquote(resource)
-        blog = Content.get_by_id(int(id))
-        text = blog.content
-        subject = blog.subject
-        last_query  = memcache.get(id) 
-        if last_query:
-           last =  int(time.time()) - int(last_query)
+        post_id = urllib.unquote(resource)
+        #check = db.GqlQuery("select * from Content where id = :1",id).get()
+        #if check:
+	blog = Content.get_by_id(int(post_id))
+	if blog:
+	  
+           text = blog.content
+           subject = blog.subject
+           last_query  = memcache.get(post_id) 
+           if last_query:
+              last =  int(time.time()) - int(last_query)
+           else:
+              last = 0
+           self.render("blog.html",content=text,subject=subject, last=last)
         else:
-           last = 0
-        self.render("blog.html",content=text,subject=subject, last=last)
+	   self.write("Error 404")
+	    
+        
+        
 
 
 
@@ -256,7 +265,7 @@ class WikiPage(Handler):
             id = wiki_valid.key().id()
             text = WIKI.get_by_id(int(id))
             content = text.content
-            self.render('wiki2.html',content=content )
+            self.render('wiki_page.html',content=content )
         else:
             self.redirect('/wiki/_edit/%s' % name)
 
@@ -274,9 +283,9 @@ class EditPage(Handler):
                     id = wiki_valid.key().id()
                     text = WIKI.get_by_id(int(id))
                     wiki = text.content
-                    self.render('/wiki.html', text = wiki)
+                    self.render('/wiki_edit.html', text = wiki)
                 else:
-                    self.render('/wiki.html')
+                    self.render('/wiki_edit.html')
         else:
             self.redirect("/login")
     def post(self, resourse):
@@ -308,6 +317,6 @@ class wiki_history(Handler):
 PAGE_RE = r'(/(?:[a-zA-Z0-9_-]+/?)*)'	
 
 app = webapp2.WSGIApplication([('/',Blog),('/newpost',NewPost),('/([0-9]+)', show_single_post)
-                               ,('/signup',Submit),('/login', Login),('/logout', Logout),('/.json',JsonArticleList)
+                               ,('/signup',signup),('/login', Login),('/logout', Logout),('/.json',JsonArticleList)
                                ,('/([0-9]+).json',JsonSingleArticle),('/flush', Flush),('/wiki/_edit' + PAGE_RE, EditPage),('/wiki/_history' + PAGE_RE, wiki_history)
                                , (PAGE_RE, WikiPage)],debug= True)
